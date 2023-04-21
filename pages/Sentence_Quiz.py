@@ -120,13 +120,13 @@ def update_asl_letter(n_clicks, label, pathname, guess):
             guess = ' '.join([i.upper() for i in guess.strip().split(" ")])
             if(guess == current_word):
                 remaining_guesses = 3
-                return current_image, "Play Again", f"Correct! The ASL word above is {current_word.upper()}.", ""
+                return current_image, "Play Again", f"Correct! The ASL sentence above is '{current_word.upper()}'.", ""
             
             else:
                 remaining_guesses -= 1
                 if(remaining_guesses == 0):
                     remaining_guesses = 3
-                    return current_image, "Play Again", f"Sorry, you have run out of guesses. The ASL word was {current_word.upper()}", ""
+                    return current_image, "Play Again", f"Sorry, you have run out of guesses. The ASL sentence was '{current_word.upper()}'.", ""
                 if(guess != current_word):
                     return current_image, "Submit", f"Sorry, that is not correct. You have {remaining_guesses} guesses remaining.", ""
 

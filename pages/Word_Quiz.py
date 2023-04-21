@@ -83,13 +83,13 @@ def toggle_collapse(n_clicks, is_open):
 def generate_new_word():
     while(True):
         word = random.choice(english_words).upper()
-        if(11 > len(word) > 2):break
+        if(9 > len(word) > 2):break
         else: continue
     return word
 
 remaining_guesses = 3
-current_word = 'ASL'
-current_image = ''
+current_word = ''
+current_image = None
 
 @callback(
     [Output("word_image", "children"),  Output("submit-btn_word", "children"), Output("result_word", "children"), Output("word_guess", "value")],
@@ -100,30 +100,24 @@ def update_asl_letter(n_clicks, label, pathname, guess):
     global current_word, current_image, remaining_guesses
     user_agent = parse(request.headers['User-Agent'])
     image_size = "60px" if not user_agent.is_mobile else "40px"
+    if not current_word:
+        current_word = 'ASL'
+        word_images = [ASL_dict[c] for c in current_word]
+        current_image = word_image_maker(word_images, image_size)
+
     if n_clicks:
         if label == "Play Again":
             remaining_guesses = 3
-            word = generate_new_word()
-            current_word = word
+            current_word = generate_new_word()
             word_images = [ASL_dict[c] for c in current_word]
             current_image = word_image_maker(word_images, image_size)
-            return current_image, "Submit", "", ""
-        
         else:
-            
-            if(guess.upper() == current_word.upper()):
-                remaining_guesses = 3
-                return current_image, "Play Again", f"Correct! The ASL word above is {current_word.upper()}.", ""
-            
+            remaining_guesses -= 1
+            if remaining_guesses == 0:
+                return [current_image, "Play Again", f"Sorry, you didn't guess the word '{current_word}'. Try again!", ""]
+            elif guess.upper() == current_word:
+                return [current_image, "Play Again", f"Congratulations! You guessed the word '{current_word}'!", ""]
             else:
-                remaining_guesses -= 1
-                if(remaining_guesses == 0):
-                    remaining_guesses = 3
-                    return current_image, "Play Again", f"Sorry, you have run out of guesses. The ASL word was {current_word.upper()}", ""
-                if(guess.upper() != current_word.upper()):
-                    return current_image, "Submit", f"Sorry, that is not correct. You have {remaining_guesses} guesses remaining.", ""
-
-    else:
-        word_images = [ASL_dict[c] for c in current_word]
-        current_image = word_image_maker(word_images, image_size)
-        return current_image, "Submit", "", ""
+                return [current_image, label, f"Wrong! You have {remaining_guesses} guesses left.", ""]
+    
+    return [current_image, "Submit", "", ""]

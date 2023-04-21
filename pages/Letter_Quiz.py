@@ -76,22 +76,6 @@ def generate_new_letter():
         else: continue
     return letter
 
-@callback(
-    Output("asl-letter", "src", allow_duplicate=True),
-    [Input("submit-btn", "n_clicks"), Input("submit-btn", "children")],
-    [State("guess", "value")], 
-    prevent_initial_call=True
-)
-def update_asl_letter(n_clicks, label, guess):
-    global current_letter, remaining_guesses, previous_letter
-    if not n_clicks:
-        # Set initial image source
-        previous_letter = current_letter
-        current_letter = generate_new_letter()
-        return ASL_dict[current_letter]
-    else:
-        return ASL_dict[current_letter]
-
 
 @callback(
     [Output("result", "children", allow_duplicate=True), Output("asl-letter", "src"), Output("submit-btn", "children"), Output("guess", "value")],
@@ -111,14 +95,14 @@ def check_guess(n_clicks, label, guess = ''):
             if guess.upper() == current_letter:
                 # Correct guess - generate new letter and update image
                 remaining_guesses = 3
-                return f"Correct! The ASL letter above is {current_letter.upper()}.", ASL_dict[current_letter], "Play Again", ""
+                return f"Correct! The ASL letter above is '{current_letter.upper()}'.", ASL_dict[current_letter], "Play Again", ""
             else:
                 # Incorrect guess - prompt user to try again
                 remaining_guesses -= 1
                 if remaining_guesses == 0:
                     # Game over - reset guesses and generate new letter
                     remaining_guesses = 3
-                    return f"Sorry, you have run out of guesses. The ASL letter was {current_letter.upper()}. Try again!", ASL_dict[current_letter], "Play Again", ""
+                    return f"Sorry, you have run out of guesses. The ASL letter was '{current_letter.upper()}'. Try again!", ASL_dict[current_letter], "Play Again", ""
                 else:
                     # Incorrect guess but not game over - prompt user to try again
                     current_image = ASL_dict[current_letter]
